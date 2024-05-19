@@ -32,6 +32,6 @@ for index, row in df.iterrows():
         df.at[index, 'Longitude'] = longitude
 
 # Save the updated DataFrame to a new Excel file
-df.to_excel(r"C:\Users\Desktop\LBT2022_latest.xlsx")
+df.to_excel(r"C:\Users\Desktop\LBT2020_latest.xlsx")
 
 print("File has been saved.")
