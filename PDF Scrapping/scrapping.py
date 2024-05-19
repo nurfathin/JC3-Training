@@ -1,37 +1,39 @@
+import pdfplumber
 import pandas as pd
-from geopy.geocoders import nominatim
-from geopy.exc import GeocoderTimedOut
 
-#Load the excel file
-df = pd.read_excel(r"C:\Users\USER\Desktop\LBT2020_xlsx")
+def extract_tables_from_pdf(pdf_path, start_page, end_page):
+    tables = []
+    with pdfplumber.open(pdf_path) as pdf:
+        for page_number in range(start_page, end_page + 1):
+            page = pdf.pages[page_number - 1]  # Pages are 0-indexed
+            extracted_tables = page.extract_tables()
+            tables.extend(extracted_tables)
+    return tables
 
-#Fill missing values in 'Negeri', 'Daerah', 'Date' and 'Ruj No' column with values from the rows above
-df['Negeri'].fillna(method='ffill', inplace=True)
-df['Daerah'].fillna(method='ffill', inplace=True)
-df['Date'].fillna(method='ffill', inplace=True)
-df['Ruj No'].fillna(method='ffill', inplace=True)
+def remove_table_headers(tables, header_rows=3):
+    tables_without_headers = []
+    for table in tables:
+        if len(table) > header_rows:
+            tables_without_headers.append(table[header_rows:])  # Exclude the first three rows (header)
+    return tables_without_headers
 
-#Function to geocode addresses and get latitude and longitude
-def geocode_address(address)
-    geolocator = Nominatim(user_agent="flood_geocoder", timeout=10) #Adjust timeout as needed
-    try:
-        location = geolocator.geocode(address)
-        if location:
-            return location.latitude, location.longitude
-        else:
-            return None, None
-    except GeocoderTimedOut
-        return None, None
+def compile_tables_into_dataframe(tables):
+    compiled_table = []
+    for table in tables:
+        compiled_table.extend(table)
+    return pd.DataFrame(compiled_table)
 
-# Fill missing latitude and longitude values using geocoding
-for index, row in df.iterrows():
-    if pd.isnull(row['Latitude']) or pd.isnull(row['Longitude']):
-        address = f"{row['Kawasan Banjir']}, {row['Daerah']}, {row['Negeri']}, Malaysia" 
-        latitude, longitude = geocode_address(address)
-        df.at[index, 'Latitude'] = latitude
-        df.at[index, 'Longitude'] = longitude
+def save_tables_to_excel(tables, excel_path):
+    with pd.ExcelWriter(excel_path) as writer:
+        df = compile_tables_into_dataframe(tables)
+        df.to_excel(writer, sheet_name='Data 2020', index=False, header=False)
 
-# Save the updated DataFrame to a new Excel file
-df.to_excel(r"C\Users\USER\Descktop\LBT2020.xlsx")
+pdf_path = (r"C:\Users\Desktop\LBT2020.pdf") #your pdf path
+start_page = 173
+end_page = 239 #you need to add by one more page for the end page
 
-print("File has been saved.")
+tables = extract_tables_from_pdf(pdf_path, start_page, end_page)
+tables_without_headers = remove_table_headers(tables)
+save_tables_to_excel(tables_without_headers, r"C:\Users\Dekstop\LBT2020.xlsx")
+
+print("Data has been saved.")
