@@ -1,5 +1,5 @@
 import pandas as pd
-from geopy.geocoders import nominatim
+from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut
 
 #Load the excel file
@@ -12,7 +12,7 @@ df['Date'].fillna(method='ffill', inplace=True)
 df['Ruj No'].fillna(method='ffill', inplace=True)
 
 #Function to geocode addresses and get latitude and longitude
-def geocode_address(address)
+def geocode_address(address):
     geolocator = Nominatim(user_agent="flood_geocoder", timeout=10) #Adjust timeout as needed
     try:
         location = geolocator.geocode(address)
@@ -20,7 +20,7 @@ def geocode_address(address)
             return location.latitude, location.longitude
         else:
             return None, None
-    except GeocoderTimedOut
+    except GeocoderTimedOut:
         return None, None
 
 # Fill missing latitude and longitude values using geocoding
