@@ -1,4 +1,0 @@
-This is the dataset of car parks that includes latitude and longitude coordinates along with a value at risk attribute. 
-
-1. Each car park's precise geographic location is specified by the latitude and longitude coordinates.
-2. The "value at risk" attribute provides an estimate of the potential financial loss or risk associated with each car park.
